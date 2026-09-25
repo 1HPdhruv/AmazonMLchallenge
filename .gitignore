@@ -1,0 +1,28 @@
+# --- environment / caches
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# --- data: real competition data must NEVER be committed
+data/raw/
+data/processed/
+data/splits/
+# synthetic trees: bulky, fully regenerable from tests/synthetic/generate_data.py
+data/synthetic*/
+# the official bundle, if unzipped inside the repo
+student_resource/
+
+# --- generated outputs (regenerable; summaries live in reports/*.md)
+artifacts/
+# explicitly: pre-compliance v1 checkpoint is "not comparable" (reports/deep_pass_report.md)
+artifacts/synthetic_best_v1/
+experiments/ablation/
+experiments/audit_smoke/
+experiments/smoke/
+logs/
+output/
+submissions/*.tsv
+submissions/*.csv
+*.pkl
+*.zip

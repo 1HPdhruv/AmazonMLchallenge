@@ -1,0 +1,41 @@
+{
+  "label": "SYNTHETIC VALIDATION — NOT COMPETITION PERFORMANCE (engineering scaling only)",
+  "rows": [
+    {
+      "n_entities": 10,
+      "n_records": 21,
+      "n_pairs": 28,
+      "prepare_s": 0.16,
+      "train_predict_s": 1.81,
+      "rss_delta_mb": 126.4,
+      "status": "ok"
+    },
+    {
+      "n_entities": 100,
+      "n_records": 205,
+      "n_pairs": 710,
+      "prepare_s": 0.31,
+      "train_predict_s": 0.12,
+      "rss_delta_mb": 3.4,
+      "status": "ok"
+    },
+    {
+      "n_entities": 1000,
+      "n_records": 2039,
+      "n_pairs": 22910,
+      "prepare_s": 2.13,
+      "train_predict_s": 0.73,
+      "rss_delta_mb": 17.2,
+      "status": "ok"
+    },
+    {
+      "n_entities": 10000,
+      "n_records": 19998,
+      "n_pairs": 378718,
+      "prepare_s": 32.21,
+      "train_predict_s": 4.54,
+      "rss_delta_mb": 269.2,
+      "status": "ok"
+    }
+  ]
+}

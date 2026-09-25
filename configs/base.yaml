@@ -1,0 +1,32 @@
+# Base configuration. See configs/competition_facts.md for the official data/output contract.
+# DATASET UNAVAILABLE MODE: data.root points at a synthetic tree in the OFFICIAL layout.
+# REAL DATA MODE: set mode: real, metric_label: "", and data.root: <path to student_resource/>.
+mode: synthetic            # synthetic | real
+metric_label: "SYNTHETIC VALIDATION — NOT COMPETITION PERFORMANCE"
+seed: 7
+
+data:
+  root: data/synthetic     # contains dataset/train/*.tsv, dataset/test/*.tsv (and utils/ for real data)
+  official_validator: utils/validate_submission.py   # relative to data.root; HARD GATE when present
+
+synthetic: {n_entities: 6000, seed: 7}   # used only when mode: synthetic and the tree is missing
+
+# Entity-level split of the labelled TRAIN files (the official test files are never split).
+# "test" below = an internal holdout carved from train, NOT the official test set.
+splits: {val_frac: 0.2, test_frac: 0.2, calib_frac_of_train: 0.25}
+
+# Representations. Values chosen by the deep-improvement pass (reports/deep_pass_report.md, ablation_log.md):
+normalization:
+  address_parser: v2          # A1 kept: content-based parser (landmarks, unit segment, postal anywhere, FR articles)
+  collapse_initials: true     # B1 kept (bug fix): S.K./M.G./L.L.C. collapsed, M/s stripped
+  legal_dictionary: null      # N1 rejected on synthetic; configs/legal_forms.yaml ready for the first real-data A/B
+
+retrieval:
+  channels: {exact: true, char: true, word: true, addr: true}
+  exact_max_postings: 30
+  char: {k: 20, min_score: 0.4}   # provisional (synthetic sweep); re-tune on real train entities
+  word: {k: 20, min_score: 0.4}
+  address: {k: 20, idf_floor: 3.0, max_postings: 50}
+
+output: {dir: output}             # output/matching_results.tsv + output/candidate_pairs.tsv
+paths: {reports: reports, artifacts: artifacts, submissions: submissions, logs: logs}

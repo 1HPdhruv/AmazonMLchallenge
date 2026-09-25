@@ -1,0 +1,52 @@
+{
+  "label": "SYNTHETIC VALIDATION — NOT COMPETITION PERFORMANCE",
+  "variants": {
+    "all_channels": {
+      "val_union_recall": 0.9809,
+      "pairs": 215503,
+      "val_macro_f05": 0.952,
+      "no_match_fp": 0.0256,
+      "params": {
+        "t": 0.4,
+        "delta": 0.2
+      },
+      "bootstrap_vs_all": null
+    },
+    "no_word": {
+      "val_union_recall": 0.9801,
+      "pairs": 202409,
+      "val_macro_f05": 0.952,
+      "no_match_fp": 0.0372,
+      "params": {
+        "t": 0.35,
+        "delta": 0.2
+      },
+      "bootstrap_vs_all": {
+        "diff": 0.0,
+        "ci90": [
+          -0.005,
+          0.0051
+        ],
+        "p_improve": 0.507
+      }
+    },
+    "no_exact": {
+      "val_union_recall": 0.9809,
+      "pairs": 215379,
+      "val_macro_f05": 0.95,
+      "no_match_fp": 0.0233,
+      "params": {
+        "t": 0.4,
+        "delta": 0.15
+      },
+      "bootstrap_vs_all": {
+        "diff": -0.002,
+        "ci90": [
+          -0.0058,
+          0.0018
+        ],
+        "p_improve": 0.188
+      }
+    }
+  }
+}

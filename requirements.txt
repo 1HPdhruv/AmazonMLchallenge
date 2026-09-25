@@ -1,0 +1,13 @@
+# Versions this build was executed and tested with (Python 3.13.0, Windows 11).
+# NOTE: on the build machine numpy/scipy/scikit-learn/PyYAML were resolved from a global
+# PYTHONPATH (D:\Quantum); pin these versions in a clean venv for exact reproduction.
+numpy==2.5.2
+pandas==3.0.1
+scipy==1.18.0
+scikit-learn==1.9.0
+xgboost==3.2.0
+rapidfuzz==3.14.6
+jellyfish==1.2.1          # MIT; phonetic codes (Metaphone/NYSIIS)
+PyYAML==6.0.3
+psutil==7.2.2
+pytest==9.1.1

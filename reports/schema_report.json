@@ -1,0 +1,124 @@
+{
+  "label": "SYNTHETIC VALIDATION — NOT COMPETITION PERFORMANCE",
+  "n_entities": 6000,
+  "n_records": 12167,
+  "records_per_source": {
+    "source2": 6711,
+    "source3": 5456
+  },
+  "present_fields_per_source": {
+    "source1": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country",
+      "(parsed from business_address: street/city/region/postal)"
+    ],
+    "source2": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country",
+      "(parsed from business_address: street/city/region/postal)"
+    ],
+    "source3": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country",
+      "(parsed from business_address: street/city/region/postal)"
+    ]
+  },
+  "countries_source1": {
+    "US": 3340,
+    "India": 2660
+  },
+  "countries_records": {
+    "US": 6804,
+    "India": 5363
+  },
+  "entity_field_stats": {
+    "entity_id": {
+      "non_null_frac": 1.0,
+      "n_unique": 6000
+    },
+    "name": {
+      "non_null_frac": 1.0,
+      "n_unique": 5245
+    },
+    "address": {
+      "non_null_frac": 0.97,
+      "n_unique": 5256
+    },
+    "city": {
+      "non_null_frac": 0.97,
+      "n_unique": 14
+    },
+    "region": {
+      "non_null_frac": 0.97,
+      "n_unique": 12
+    },
+    "postal": {
+      "non_null_frac": 0.9223,
+      "n_unique": 168
+    },
+    "country": {
+      "non_null_frac": 1.0,
+      "n_unique": 2
+    },
+    "full_address": {
+      "non_null_frac": 0.97,
+      "n_unique": 5763
+    }
+  },
+  "record_field_stats": {
+    "record_id": {
+      "non_null_frac": 1.0,
+      "n_unique": 12167
+    },
+    "source": {
+      "non_null_frac": 1.0,
+      "n_unique": 2
+    },
+    "name": {
+      "non_null_frac": 0.9687,
+      "n_unique": 11285
+    },
+    "address": {
+      "non_null_frac": 0.8992,
+      "n_unique": 9766
+    },
+    "city": {
+      "non_null_frac": 0.7654,
+      "n_unique": 533
+    },
+    "region": {
+      "non_null_frac": 0.7063,
+      "n_unique": 56
+    },
+    "postal": {
+      "non_null_frac": 0.6586,
+      "n_unique": 195
+    },
+    "country": {
+      "non_null_frac": 1.0,
+      "n_unique": 2
+    },
+    "full_address": {
+      "non_null_frac": 0.8992,
+      "n_unique": 10771
+    }
+  },
+  "labels": {
+    "n_label_pairs": 5952,
+    "records_linked_to_multiple_entities": 0,
+    "entities_no_match": 2102,
+    "entities_single_match": 2731,
+    "entities_multi_match": 1167,
+    "max_matches_per_entity": 4
+  },
+  "critical": [],
+  "warnings": [
+    "records: 45 rows with neither name nor address"
+  ]
+}

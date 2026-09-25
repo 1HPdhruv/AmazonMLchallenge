@@ -1,0 +1,69 @@
+# Legal-form dictionary: linguistic prior knowledge (NOT learned from data, NOT an external lookup).
+# Matching rule (src/preprocessing/legal.py): folded, punctuation-free tokens; only TRAILING spans are
+# stripped (up to 2 spans, never the first token); the longest matching span wins.
+# Keys = normalised country code (src/preprocessing/address.norm_country). A country without an entry
+# (e.g. a genuinely unseen one) uses `_generic`, which contains only UNAMBIGUOUS multi-letter forms, so
+# short tokens that are real name words elsewhere (sa, as, me, kk, ab, ag, co...) are never stripped there.
+# Value = canonical class; equivalent written variants share a class (compared by the legal_eq feature).
+US:
+  inc: INC
+  incorporated: INC
+  llc: LLC
+  l l c: LLC
+  corp: CORP
+  corporation: CORP
+  co: CO
+  company: CO
+  lp: LP
+  llp: LLP
+  lllp: LLP
+  ltd: LTD
+  limited: LTD
+  pllc: PLLC
+  pc: PC
+  pa: PA
+IN:
+  pvt ltd: PVT_LTD
+  private limited: PVT_LTD
+  pvt limited: PVT_LTD
+  private ltd: PVT_LTD
+  p ltd: PVT_LTD
+  ltd: LTD
+  limited: LTD
+  llp: LLP
+  and co: AND_CO
+  and company: AND_CO
+  co: CO
+  company: CO
+  proprietorship: PROP
+  opc: OPC
+  opc pvt ltd: OPC
+  opc private limited: OPC
+FR:
+  sarl: SARL
+  sas: SAS
+  sasu: SASU
+  eurl: EURL
+  sa: SA
+  eirl: EIRL
+  snc: SNC
+  sci: SCI
+  selarl: SELARL
+  scop: SCOP
+_generic:
+  inc: INC
+  incorporated: INC
+  llc: LLC
+  llp: LLP
+  corp: CORP
+  corporation: CORP
+  company: CO
+  ltd: LTD
+  limited: LTD
+  plc: PLC
+  pvt ltd: PVT_LTD
+  private limited: PVT_LTD
+  gmbh: GMBH
+  sarl: SARL
+  sasu: SASU
+  eurl: EURL
