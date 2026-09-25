@@ -14,11 +14,20 @@ import numpy as np
 from src.preprocessing.tokenize import ok
 
 
-def exact_channel(ent_keys, rec_keys, max_postings: int):
+def resolve_cap(cap, pool_size: int) -> int:
+    """A posting cap is either a fixed int (legacy) or {min: m, per_million: x}: max(m, x * pool/1e6).
+    Fixed caps sized for a 12k-record synthetic pool silently drop most keys in a 10M-record pool."""
+    if isinstance(cap, dict):
+        return int(max(cap.get("min", 0), round(cap.get("per_million", 0) * pool_size / 1e6)))
+    return int(cap)
+
+
+def exact_channel(ent_keys, rec_keys, max_postings):
     post = defaultdict(list)
     for j, k in enumerate(rec_keys):
         if ok(k):
             post[k].append(j)
+    max_postings = resolve_cap(max_postings, len(rec_keys))
     qi, di = [], []
     for i, k in enumerate(ent_keys):
         p = post.get(k) if ok(k) else None
@@ -70,6 +79,7 @@ class AddressChannel:
             for key in sorted(set(ks)):
                 post[key].append(j)
         self.dropped_keys = 0
+        self.cap_used = cap = resolve_cap(self.max_postings, len(rec_key_lists))
         qi, di, sc, rk = [], [], [], []
         for i, ks in enumerate(ent_key_lists):
             acc = defaultdict(float)
@@ -78,7 +88,7 @@ class AddressChannel:
                 p = post.get(key)
                 if not p or w < self.idf_floor:
                     continue
-                if len(p) > self.max_postings:
+                if len(p) > cap:
                     self.dropped_keys += 1
                     continue
                 for j in p:

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import jellyfish
+from anyascii import anyascii
 import pandas as pd
 
 from src.preprocessing.address import norm_country, norm_postal, parse_street
@@ -62,6 +63,13 @@ def build_representations(df: pd.DataFrame, norm: dict | None = None) -> pd.Data
     out["addr_fold"] = df["full_address"].map(lambda s: fold(basic(s)))
     out["has_name"] = out["name_clean"].str.len() > 0
     out["has_addr"] = df["full_address"].map(ok)
+    # retrieval-only transliterated views (anyascii, ISC; offline, deterministic): cross-script names
+    # (Devanagari/Telugu/... vs Latin) share character n-grams only after mapping to Latin script
+    if norm.get("transliterate"):
+        tr = df["name"].map(lambda v: anyascii(v) if isinstance(v, str) else v)
+        out["name_fold_tr"] = tr.map(basic).map(fold)
+        out["name_clean_tr"] = tr.map(lambda v: " ".join(name_tokens(v)))
+        out["name_key_tr"] = tr.map(name_key)
     # phonetic codes of the cleaned name tokens (Metaphone + NYSIIS; jellyfish, MIT) for transliteration/typos
     mp = out["name_clean"].map(lambda x: [jellyfish.metaphone(t) for t in x.split()] if x else [])
     ny = out["name_clean"].map(lambda x: [jellyfish.nysiis(t) for t in x.split()] if x else [])

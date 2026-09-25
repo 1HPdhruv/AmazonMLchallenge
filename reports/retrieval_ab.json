@@ -1,0 +1,16 @@
+{
+  "_slice": {
+    "s1": 21941,
+    "pool": 175042,
+    "true_pairs": 76198,
+    "build": [
+      {
+        "stage": "build_slice",
+        "seconds": 42.45,
+        "peak_rss_mb": 729,
+        "delta_rss_mb": 550,
+        "avail_gb": 0.7
+      }
+    ]
+  }
+}

@@ -8,6 +8,8 @@ scikit-learn==1.9.0
 xgboost==3.2.0
 rapidfuzz==3.14.6
 jellyfish==1.2.1          # MIT; phonetic codes (Metaphone/NYSIIS)
+sparse_dot_topn==1.2.0  # Apache-2.0 (ING); sparse top-n cosine retrieval, no dense similarity blocks
+anyascii==0.3.3         # ISC (permissive, MIT-equivalent); offline script->Latin transliteration for retrieval
 PyYAML==6.0.3
 psutil==7.2.2
 pytest==9.1.1
