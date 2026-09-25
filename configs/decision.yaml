@@ -1,0 +1,13 @@
+# Decision layer (PROVISIONAL: synthetic evidence only; re-select on real train data).
+# exclusive_mode auto: Source 1 is officially deduplicated -> a record may go to at most one Source-1 entity
+#   (its strict best over ALL candidates); enabled only if train ground truth links no record to >1 entity.
+# retune: parameters are re-tuned on the calib fold by src/pipeline/train.py for the model being shipped.
+calibrated: true
+mechanism: multi
+params:
+  t: 0.4
+  delta: 0.2
+exclusive_mode: auto
+tie_break: low
+unseen_margin: 0.0
+retune: true
