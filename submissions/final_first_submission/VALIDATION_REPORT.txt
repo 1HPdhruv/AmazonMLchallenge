@@ -1,0 +1,23 @@
+{
+  "test_source1_entities": 1732544,
+  "test_source1_unique": 1732544,
+  "test_records": 9969589,
+  "matching_results.tsv": {
+    "rows": 1732544,
+    "rows_with_ids": 1562228,
+    "rows_empty": 170316,
+    "total_ids": 3719319,
+    "bytes": 70440062,
+    "sha256": "c064000e6d4c12e279fc053d00e0f612fd3fba17622e357b78e520f56026b725"
+  },
+  "candidate_pairs.tsv": {
+    "rows": 1732544,
+    "rows_with_ids": 1732544,
+    "rows_empty": 0,
+    "total_ids": 108873021,
+    "bytes": 1425561423,
+    "sha256": "5adf838af52ad8ba9c0ebc42772515755d6643fcb4cdb87032350dfdb9f09e07"
+  },
+  "errors": [],
+  "status": "PASS"
+}
