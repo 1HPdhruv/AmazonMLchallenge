@@ -1,0 +1,68 @@
+{
+  "records": {
+    "result": {
+      "n_records": 199910,
+      "sparse_nnz": {
+        "char": 4124027,
+        "word": 655655
+      },
+      "representations_mb": 246,
+      "per_record_us": {
+        "read_sample_s2+s3": 26.5,
+        "adapter_parse": 28.5,
+        "build_representations": 68.7,
+        "encode_tfidf_and_keys": 39.4
+      },
+      "per_record_rep_bytes": 1288,
+      "extrapolated_full_train_pool": {
+        "records": 10320219,
+        "seconds_single_core": {
+          "read_sample_s2+s3": 273,
+          "adapter_parse": 294,
+          "build_representations": 709,
+          "encode_tfidf_and_keys": 407
+        },
+        "representations_gb": 12.4,
+        "sparse_gb_char_word": 2.8
+      }
+    },
+    "stages": [
+      {
+        "stage": "read_sample_s2+s3",
+        "seconds": 5.3,
+        "peak_rss_mb": 225,
+        "delta_rss_mb": 78,
+        "avail_gb": 5.41
+      },
+      {
+        "stage": "adapter_parse",
+        "seconds": 5.69,
+        "peak_rss_mb": 321,
+        "delta_rss_mb": 90,
+        "avail_gb": 5.32
+      },
+      {
+        "stage": "build_representations",
+        "seconds": 13.73,
+        "peak_rss_mb": 722,
+        "delta_rss_mb": 383,
+        "avail_gb": 4.96
+      },
+      {
+        "stage": "encode_tfidf_and_keys",
+        "seconds": 7.87,
+        "peak_rss_mb": 807,
+        "delta_rss_mb": 43,
+        "avail_gb": 4.91
+      }
+    ],
+    "args": {
+      "mode": "records",
+      "n": 200000,
+      "s1_frac": 0.01,
+      "pools": "100000,200000,400000,800000"
+    },
+    "cpu_count": 16,
+    "total_ram_gb": 15.3
+  }
+}

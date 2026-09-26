@@ -35,6 +35,29 @@ GT_COLS = ["source1_entity_id", "matched_entity_ids"]
 PREFIX = {"source1": "S1-", "source2": "S2-", "source3": "S3-"}
 
 
+def _ci_join(path: str):
+    """Resolve `path` component-by-component ignoring letter case; None if it does not exist."""
+    path = os.path.normpath(path)
+    drive, rest = os.path.splitdrive(path)
+    parts = [x for x in rest.replace("\\", "/").split("/") if x]
+    cur = drive + (os.sep if rest.startswith(("/", "\\")) else "") or "."
+    if not parts:
+        return cur if os.path.exists(cur) else None
+    for part in parts:
+        if part in (".", ".."):
+            cur = os.path.join(cur, part)
+            continue
+        try:
+            names = os.listdir(cur)
+        except OSError:
+            return None
+        hit = next((n for n in names if n == part), None) or next((n for n in names if n.lower() == part.lower()), None)
+        if hit is None:
+            return None
+        cur = os.path.join(cur, hit)
+    return cur
+
+
 class SchemaViolation(Exception):
     pass
 
@@ -105,9 +128,19 @@ class CompetitionDataAdapter:
                                for k in PREFIX}
         self.issues: list[str] = []
 
+    def split_dir(self, split: str) -> str:
+        """Case-insensitive: accepts <root>/dataset/<split>/ (official bundle) or <root>/<split>/ (e.g. the
+        extracted 'Dataset/Train', 'Dataset/Test' folders), in any letter case."""
+        for cand in (os.path.join(self.root, "dataset"), self.root):
+            base = _ci_join(cand) if os.path.isdir(cand) or _ci_join(cand) else None
+            if base and _ci_join(os.path.join(base, split)):
+                return _ci_join(os.path.join(base, split))
+        return os.path.join(self.root, "dataset", split)
+
     def path(self, split: str, name: str) -> str:
-        return os.path.join(self.root, "dataset", split, f"{split}_{name}.tsv" if name.startswith("source")
-                            else f"{name}.tsv")
+        fname = f"{split}_{name}.tsv" if name.startswith("source") else f"{name}.tsv"
+        d = self.split_dir(split)
+        return _ci_join(os.path.join(d, fname)) or os.path.join(d, fname)
 
     def available(self, split: str) -> bool:
         return all(os.path.exists(self.path(split, s)) for s in PREFIX)
@@ -129,7 +162,7 @@ class CompetitionDataAdapter:
         return ents, recs, labels
 
     def load_labels(self, split, ent_ids: set, rec_ids: set, path: str | None = None):
-        path = path or os.path.join(self.root, "dataset", "train", "train_ground_truth.tsv")
+        path = path or self.path("train", "train_ground_truth")
         if not os.path.exists(path):
             self.issues.append(f"ground truth not found: {path}")
             return None

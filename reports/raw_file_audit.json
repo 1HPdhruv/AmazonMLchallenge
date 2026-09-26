@@ -1,0 +1,102 @@
+{
+  "train_source1": {
+    "stats": {
+      "crlf_header": 0,
+      "rows": 2206821,
+      "has_quote_char": 4,
+      "duplicate_ids": 0
+    },
+    "countries": {
+      "US": 1323633,
+      "India": 883188
+    }
+  },
+  "train_source2": {
+    "stats": {
+      "crlf_header": 0,
+      "rows": 5034616,
+      "empty_address": 168967,
+      "has_quote_char": 6,
+      "duplicate_ids": 0
+    },
+    "countries": {
+      "US": 3016817,
+      "India": 2017799
+    }
+  },
+  "train_source3": {
+    "stats": {
+      "crlf_header": 0,
+      "rows": 5285603,
+      "empty_address": 175916,
+      "duplicate_ids": 0
+    },
+    "countries": {
+      "US": 3170056,
+      "India": 2115547
+    }
+  },
+  "train_ground_truth": {
+    "stats": {
+      "rows": 2206821,
+      "pairs": 7638365,
+      "s1_missing_from_gt": 0,
+      "records_linked_to_multiple_s1": 0
+    },
+    "match_cardinality": {
+      "0": 123247,
+      "1": 119157,
+      "2": 375212,
+      "3": 530841,
+      "4": 484115,
+      "5": 321957,
+      "6": 164868,
+      "7": 63968,
+      "8": 18680,
+      "9": 4205,
+      "10+": 571
+    }
+  },
+  "test_source1": {
+    "stats": {
+      "crlf_header": 0,
+      "rows": 1732544,
+      "has_quote_char": 134,
+      "duplicate_ids": 0
+    },
+    "countries": {
+      "India": 809986,
+      "US": 663106,
+      "France": 259452
+    }
+  },
+  "test_source2": {
+    "stats": {
+      "crlf_header": 0,
+      "rows": 4887273,
+      "empty_address": 129408,
+      "has_quote_char": 349,
+      "duplicate_ids": 0
+    },
+    "countries": {
+      "India": 2312565,
+      "US": 1871330,
+      "France": 703378
+    }
+  },
+  "test_source3": {
+    "stats": {
+      "crlf_header": 0,
+      "rows": 5082316,
+      "empty_address": 136098,
+      "has_quote_char": 330,
+      "duplicate_ids": 0
+    },
+    "countries": {
+      "India": 2405000,
+      "US": 1945701,
+      "France": 731615
+    }
+  },
+  "runtime_s": 84.8
+}

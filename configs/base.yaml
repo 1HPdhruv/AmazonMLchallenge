@@ -1,12 +1,12 @@
 # Base configuration. See configs/competition_facts.md for the official data/output contract.
 # DATASET UNAVAILABLE MODE: data.root points at a synthetic tree in the OFFICIAL layout.
 # REAL DATA MODE: set mode: real, metric_label: "", and data.root: <path to student_resource/>.
-mode: synthetic            # synthetic | real
-metric_label: "SYNTHETIC VALIDATION — NOT COMPETITION PERFORMANCE"
+mode: real                 # synthetic | real   (real data landed 2026-09-25)
+metric_label: ""           # real data: no synthetic label (synthetic runs set their own)
 seed: 7
 
 data:
-  root: data/synthetic     # contains dataset/train/*.tsv, dataset/test/*.tsv (and utils/ for real data)
+  root: Dataset            # real data in place: Dataset/Train, Dataset/Test (case-insensitive lookup; gitignored)
   official_validator: utils/validate_submission.py   # relative to data.root; HARD GATE when present
 
 synthetic: {n_entities: 6000, seed: 7}   # used only when mode: synthetic and the tree is missing
@@ -23,10 +23,13 @@ normalization:
 
 retrieval:
   channels: {exact: true, char: true, word: true, addr: true}
-  exact_max_postings: 30
+  # posting caps scale with the record pool: max(min, per_million * pool/1e6). The old fixed 30/50 were sized for a
+  # 12k synthetic pool and dropped 14% (name) / 15-34% (address) of key occurrences on the real 10.3M pool
+  # (reports/postings_histogram.json); ~1,030 at full scale drops 0.1% (name) / 2.6-6.2% (address).
+  exact_max_postings: {min: 30, per_million: 100}
   char: {k: 20, min_score: 0.4}   # provisional (synthetic sweep); re-tune on real train entities
   word: {k: 20, min_score: 0.4}
-  address: {k: 20, idf_floor: 3.0, max_postings: 50}
+  address: {k: 20, idf_floor: 3.0, max_postings: {min: 50, per_million: 100}}
 
 output: {dir: output}             # output/matching_results.tsv + output/candidate_pairs.tsv
 paths: {reports: reports, artifacts: artifacts, submissions: submissions, logs: logs}

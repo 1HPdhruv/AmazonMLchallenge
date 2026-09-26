@@ -6,6 +6,8 @@ seeing val/test text. This is the train-only rule of CONFIG.md, enforced structu
 """
 from __future__ import annotations
 
+import os
+
 import numpy as np
 import scipy.sparse as sp
 from sklearn.feature_extraction.text import HashingVectorizer
@@ -60,7 +62,40 @@ class HashedTfidf:
         return self.idf[X.indices]
 
 
-def topk_cosine(Q, D, k: int, min_score: float, chunk: int = 1000, tie_cap: int = 0):
+def topk_cosine_sparse(Q, D, k: int, min_score: float, chunk: int = 20000, n_threads: int = 0, DT=None):
+    """Sparse top-n cosine via sparse_dot_topn (Apache-2.0): never materialises a dense query x pool block.
+    Cost scales with the shared non-zeros, not with pool size. Same return contract as topk_cosine."""
+    from sparse_dot_topn import sp_matmul_topn
+    if DT is None:
+        DT = D.T.tocsr()
+    n_threads = n_threads or max(1, (os.cpu_count() or 2) - 1)
+    qi, di, sc, rk = [], [], [], []
+    for s in range(0, Q.shape[0], chunk):
+        C = sp_matmul_topn(Q[s:s + chunk], DT, top_n=k, threshold=min_score, sort=True, n_threads=n_threads)
+        C = C.tocsr()
+        counts = np.diff(C.indptr)
+        rows = np.repeat(np.arange(C.shape[0]), counts)
+        keep = C.data >= min_score
+        ranks = np.arange(len(C.data)) - np.repeat(C.indptr[:-1], counts) + 1   # data sorted desc per row
+        qi.append(rows[keep] + s)
+        di.append(C.indices[keep])
+        sc.append(C.data[keep])
+        rk.append(ranks[keep])
+    if not qi:
+        return (np.array([], int),) * 2 + (np.array([]), np.array([], int))
+    return (np.concatenate(qi).astype(np.int64), np.concatenate(di).astype(np.int64),
+            np.concatenate(sc), np.concatenate(rk).astype(np.int64))
+
+
+def topk_cosine(Q, D, k: int, min_score: float, chunk: int = 1000, tie_cap: int = 0, engine: str = "dense",
+                n_threads: int = 0, DT=None):
+    """engine 'dense' = legacy dense-block path (small pools / tie_cap); 'sparse' = sparse_dot_topn."""
+    if engine == "sparse" and not tie_cap:
+        return topk_cosine_sparse(Q, D, k, min_score, n_threads=n_threads, DT=DT)
+    return _topk_cosine_dense(Q, D, k, min_score, chunk, tie_cap)
+
+
+def _topk_cosine_dense(Q, D, k: int, min_score: float, chunk: int = 1000, tie_cap: int = 0):
     """Returns (q_idx, d_idx, score, rank) for top-k cosine neighbours per query row.
     tie_cap > 0: records tied with the k-th score are ALL kept (up to tie_cap in total) instead of being
     cut by row position, which otherwise systematically favours records listed first (Source 2)."""

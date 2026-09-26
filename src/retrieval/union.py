@@ -45,8 +45,10 @@ class CandidateGenerator:
 
     def fit(self, train_ent_rep: pd.DataFrame):
         self.char_field = self.cfg.get("char_field", "name_fold")
+        self.word_field = self.cfg.get("word_field", "name_clean")
+        self.key_field = self.cfg.get("key_field", "name_key")
         self.char.fit(train_ent_rep[self.char_field])
-        self.word.fit(train_ent_rep["name_clean"])
+        self.word.fit(train_ent_rep[self.word_field])
         self.addr.fit([address_keys(r) for _, r in train_ent_rep.iterrows()])
         if self.addrtxt is not None:
             self.addrtxt.fit(train_ent_rep["addr_fold"])
@@ -54,11 +56,45 @@ class CandidateGenerator:
 
     def encode(self, rep: pd.DataFrame):
         return {"char": self.char.transform(rep[getattr(self, "char_field", "name_fold")]),
-                "word": self.word.transform(rep["name_clean"]),
+                "word": self.word.transform(rep[getattr(self, "word_field", "name_clean")]),
+                "country": rep["country_n"].map(lambda v: v if isinstance(v, str) and v else "").values,
                 "addr_keys": [address_keys(r) for _, r in rep.iterrows()],
-                "key": rep["name_key"].tolist(),
+                "key": rep[getattr(self, "key_field", "name_key")].tolist(),
                 "phon_key": rep["name_mp_key"].tolist() if "name_mp_key" in rep else None,
                 **({"addrtxt": self.addrtxt.transform(rep["addr_fold"])} if getattr(self, "addrtxt", None) is not None else {})}
+
+    def _name_topk(self, ent_enc, rec_enc, ch):
+        """Name top-k. engine 'sparse' = sparse_dot_topn (no dense blocks). partition.enabled: top-k is taken
+        within the entity country (records with an empty country join every partition) plus a global
+        fallback top-`fallback_k`, so a mislabelled or cross-country record stays reachable."""
+        c = self.cfg
+        x = c[ch]
+        eng = c.get("engine", "dense")
+        nt = c.get("n_threads", 0)
+        part = c.get("partition") or {}
+        Q, D = ent_enc[ch], rec_enc[ch]
+        if not part.get("enabled"):
+            return topk_cosine(Q, D, x["k"], x["min_score"], tie_cap=c.get("tie_cap", 0), engine=eng, n_threads=nt)
+        qc, dc = ent_enc["country"], rec_enc["country"]
+        parts = []
+        for cc in sorted(set(qc)):
+            qi_c = np.where(qc == cc)[0]
+            di_c = np.where((dc == cc) | (dc == ""))[0] if cc else np.arange(D.shape[0])
+            if len(qi_c) == 0 or len(di_c) == 0:
+                continue
+            a, b, s_, _ = topk_cosine(Q[qi_c], D[di_c], x["k"], x["min_score"], engine=eng, n_threads=nt)
+            parts.append((qi_c[a], di_c[b], s_))
+        fb = int(part.get("fallback_k", 0))
+        if fb:
+            a, b, s_, _ = topk_cosine(Q, D, fb, x["min_score"], engine=eng, n_threads=nt)
+            parts.append((a, b, s_))
+        if not parts:
+            return (np.array([], int),) * 2 + (np.array([]), np.array([], int))
+        d = pd.DataFrame({"e": np.concatenate([p[0] for p in parts]), "r": np.concatenate([p[1] for p in parts]),
+                          "s": np.concatenate([p[2] for p in parts])})
+        d = d.sort_values(["e", "s", "r"], ascending=[True, False, True]).drop_duplicates(["e", "r"])
+        d["rk"] = d.groupby("e").cumcount() + 1
+        return d.e.values, d.r.values, d.s.values, d.rk.values
 
     def retrieve(self, ent_enc, rec_enc) -> pd.DataFrame:
         c = self.cfg
@@ -70,11 +106,9 @@ class CandidateGenerator:
             if ch == "exact":
                 r = exact_channel(ent_enc["key"], rec_enc["key"], c["exact_max_postings"])
             elif ch == "char":
-                r = topk_cosine(ent_enc["char"], rec_enc["char"], c["char"]["k"], c["char"]["min_score"],
-                                tie_cap=c.get("tie_cap", 0))
+                r = self._name_topk(ent_enc, rec_enc, "char")
             elif ch == "word":
-                r = topk_cosine(ent_enc["word"], rec_enc["word"], c["word"]["k"], c["word"]["min_score"],
-                                tie_cap=c.get("tie_cap", 0))
+                r = self._name_topk(ent_enc, rec_enc, "word")
             else:
                 r = self.addr.retrieve(ent_enc["addr_keys"], rec_enc["addr_keys"])
             self.runtime[ch] = round(time.time() - t0, 3)

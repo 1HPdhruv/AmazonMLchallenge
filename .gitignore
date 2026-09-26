@@ -26,3 +26,7 @@ submissions/*.tsv
 submissions/*.csv
 *.pkl
 *.zip
+
+# official competition data dropped at the repo root: NEVER commit
+Dataset/
+dataset/
